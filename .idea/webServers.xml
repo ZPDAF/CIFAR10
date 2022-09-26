@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="6f75f68f-e7f0-4bcd-b989-84c985f44c52" name="Lab">
+        <fileTransfer accessType="SFTP" host="g8.py3.io" port="8864" sshConfigId="8d92086b-8db5-48c7-b017-66226e7a3ce9" sshConfig="z4@g8.py3.io:8864 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
