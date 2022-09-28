@@ -22,7 +22,7 @@ test_dataloader = DataLoader(test_data, batch_size=64)
 class Model(nn.Module):
     def __init__(self):
         super(Model, self).__init__()
-        self.model_up = nn.Sequential(
+        self.model = nn.Sequential(
             nn.Conv2d(3, 32, 3, 1, 1),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(inplace=True),
@@ -97,17 +97,13 @@ for epoch in range(10):
             loss_in = loss(output, targets)
 
             sum_loss += loss_in
-            print('这里是output', output)
             accurate += (output.argmax(1) == targets).sum()
 
     print('第{}轮测试集的正确率:{:.2f}%'.format(epoch+1, accurate/len(test_data)*100))
 
     writer.add_scalar('看一下测试集损失', sum_loss, i)
     writer.add_scalar('看一下当前测试集正确率', accurate/len(test_data)*100, i)
-    i +=1
-
-    torch.save(model, '../model_pytorch/model_{}.pth'.format(epoch+1))
-    print("第{}轮模型训练数据已保存".format(epoch+1))
+    i = i + 1
 
 writer.close()
 
