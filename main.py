@@ -1,8 +1,8 @@
 import torch
 import torchvision
+import argparse
 from torch import nn
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
 
 # 准备数据集
 train_data = torchvision.datasets.CIFAR10(root='../data', train=True, transform=torchvision.transforms.ToTensor(),
@@ -43,67 +43,63 @@ class Model(nn.Module):
     def forward(self, x):
         x = self.model(x)
         return x
+def train_test(args):
+    # 创建网络模型
+    model = Model().cuda()
 
-# 创建网络模型
-model = Model().cuda()
+    # 损失函数
+    loss = nn.CrossEntropyLoss().cuda()
 
-# 添加tensorboard可视化数据
-writer = SummaryWriter('../logs_tensorboard')
+    # 优化器
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
-# 损失函数
-loss = nn.CrossEntropyLoss().cuda()
+    i = 1
 
-# 优化器
-optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+    # 记录最大准确率
+    max_accuracy = 0
 
-i = 1  # 用于绘制测试集的tensorboard
-
-# 开始循环训练
-for epoch in range(10):
-    num_time = 0  # 记录看看每轮有多少次训练
-    print('开始第{}轮训练'.format(epoch+1))
-    model.train()  # 也可以不写，规范的话是写，用来表明训练步骤
-    for data in train_dataloader:
-        # 数据分开 一个是图片数据，一个是真实值
-        imgs, targets = data
-        imgs = imgs.cuda()
-        targets = targets.cuda()
-        # 拿到预测值
-        output = model(imgs)
-        # 计算损失值
-        loss_in = loss(output, targets)
-        # 优化开始~ ~ 先梯度清零
-        optimizer.zero_grad()
-        # 反向传播+更新
-        loss_in.backward()
-        optimizer.step()
-        num_time += 1
-
-        if num_time % 100 == 0:
-            writer.add_scalar('看一下训练集损失值', loss_in.item(), num_time)
-
-    sum_loss = 0  # 记录总体损失值
-
-    # 每轮训练完成跑一下测试数据看看情况
-    accurate = 0
-    model.eval()  # 也可以不写，规范的话就写，用来表明是测试步骤
-    with torch.no_grad():
-        for data in test_dataloader:
-            # 这里的每一次循环 都是一个minibatch  一次for循环里面有64个数据。
+    # 开始训练
+    for epoch in range(args.epochs):
+        num_time = 0
+        print('开始第{}轮训练'.format(epoch + 1))
+        model.train()
+        for data in train_dataloader:
             imgs, targets = data
             imgs = imgs.cuda()
             targets = targets.cuda()
             output = model(imgs)
             loss_in = loss(output, targets)
+            optimizer.zero_grad()
+            loss_in.backward()
+            optimizer.step()
+            num_time += 1
 
-            sum_loss += loss_in
-            accurate += (output.argmax(1) == targets).sum()
+        sum_loss = 0  # 记录总体损失值
 
-    print('第{}轮测试集的正确率:{:.2f}%'.format(epoch+1, accurate/len(test_data)*100))
+        accurate = 0
+        model.eval()
+        with torch.no_grad():
+            for data in test_dataloader:
+                imgs, targets = data
+                imgs = imgs.cuda()
+                targets = targets.cuda()
+                output = model(imgs)
+                loss_in = loss(output, targets)
 
-    writer.add_scalar('看一下测试集损失', sum_loss, i)
-    writer.add_scalar('看一下当前测试集正确率', accurate/len(test_data)*100, i)
-    i = i + 1
+                sum_loss += loss_in
+                accurate += (output.argmax(1) == targets).sum()
 
-writer.close()
+        print('第{}轮测试集的损失:{} 正确率:{:.2f}%'.format(epoch + 1, loss_in, accurate / len(test_data) * 100))
 
+        if accurate > max_accuracy:
+            max_accuracy = accurate
+
+        i = i + 1
+    print('最大准确率为{:.2f}%'.format(max_accuracy / len(test_data) * 100))
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Train')
+    parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
+    parser.add_argument('--epochs', type=int, default=10, help='Number of epochs to train.')
+    args = parser.parse_args()
+    train_test(args)
