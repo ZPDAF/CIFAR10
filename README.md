@@ -10,7 +10,7 @@
 `./train_test.sh <lr> <epoches>`
 
 例： ` ./train_test.sh 0.01 10 # 以0.01学习率训练10轮`
-## Tune learning rate 
+## Tuning learning rate 
 epoches = 10
 In experiment,I train the model for 10 epoches using Adam optimizer.
 ### lr = 0.01
