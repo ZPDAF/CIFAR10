@@ -1,19 +1,22 @@
-# CIFAR hyperparameter tune
+# AISecurity-Course Assignment
 ## Instructions
-### first step
-` cd <main.py所在文件夹>`
-### second step
+### step Ⅰ
+` download and unzip the file`
+### step Ⅱ
+` cd <the same folder as main.py>`
+### step Ⅲ
 ` chmod 777 train_test.sh`
-### third step
-`./train_test.sh <学习率> <epochs>`
+### step Ⅳ
+`./train_test.sh <lr> <epoches>`
 
 例： ` ./train_test.sh 0.01 10 # 以0.01学习率训练10轮`
 ## Tune learning rate 
-epochs = 10
-### 0.01
+epoches = 10
+In experiment,I train the model for 10 epoches using Adam optimizer.
+### lr = 0.01
 ` 最大准确率为68.00%`
-### 0.001
+### lr = 0.001
 ` 最大准确率为72.96%`
-### 0.0001
+### lr = 0.0001
 ` 最大准确率为70.49%`
 
