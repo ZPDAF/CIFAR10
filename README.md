@@ -19,4 +19,5 @@ In experiment,I train the model for 10 epoches using Adam optimizer.
 ` 最大准确率为72.96%`
 ### lr = 0.0001
 ` 最大准确率为70.49%`
+
 We can see that learning rate is not linear dependent with test accuracy.
